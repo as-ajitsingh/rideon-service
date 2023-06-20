@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CreateRequestDto } from './request.dto';
-import { RequestingUser } from 'src/user/user.decorator';
-import { UserDocument } from 'src/user/user.schema';
+import { RequestingUser } from '../user/user.decorator';
+import { UserDocument } from '../user/user.schema';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/authorisation/roles.guard';
+import { RolesGuard } from '../authorisation/roles.guard';
 import { RequestService } from './request.service';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)

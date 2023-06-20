@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Request, RequestDocument } from './Request.schema';
 import { Model } from 'mongoose';
 import { CreateRequestDto } from './request.dto';
-import { UserDocument } from 'src/user/user.schema';
+import { UserDocument } from '../user/user.schema';
 
 @Injectable()
 export class RequestService {
