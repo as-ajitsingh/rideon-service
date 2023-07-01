@@ -22,7 +22,7 @@ export class RequestService {
   }
 
   getAllRequestForAdmin() {
-    return this.request.find().exec();
+    return this.request.find().populate({ path: 'raisedBy', select: 'authId' }).exec();
   }
 
   getRequest(requestId: string) {
