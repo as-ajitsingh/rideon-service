@@ -9,9 +9,7 @@ export class UserService {
 
   async getOrRegisterUser(authId: string): Promise<User> {
     const user = await this.getUser(authId);
-    return (
-      user ?? new this.user({ roles: ['employee'], authId: authId }).save()
-    );
+    return user ?? new this.user({ roles: ['employee'], authId: authId }).save();
   }
 
   async getUser(authId): Promise<User> {
