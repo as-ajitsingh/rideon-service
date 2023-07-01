@@ -1,6 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { UserDocument } from '../user/user.schema';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { VendorDocument } from '../vendor/vendor.schema';
+
+export enum RequestStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
 
 @Schema()
 export class Request {
@@ -18,6 +25,12 @@ export class Request {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   raisedBy: UserDocument;
+
+  @Prop({ type: String, enum: RequestStatus })
+  status: RequestStatus;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' })
+  allotedVendor: VendorDocument;
 }
 
 export type RequestDocument = HydratedDocument<Request>;

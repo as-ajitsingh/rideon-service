@@ -4,6 +4,7 @@ import { AuthorisationModule } from './authorisation/authorisation.module';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RequestModule } from './request/request.module';
+import { VendorModule } from './vendor/vendor.module';
 
 const getEnvFilePath = () => {
   if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
@@ -27,6 +28,7 @@ const configModuleOptions: ConfigModuleOptions = {
     AuthorisationModule,
     UserModule,
     RequestModule,
+    VendorModule,
   ],
   controllers: [],
   providers: [],
