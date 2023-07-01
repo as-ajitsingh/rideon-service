@@ -28,6 +28,11 @@ export class RequestController {
   @HttpCode(204)
   @SetMetadata('roles', ['admin'])
   updateStatus(@Param() params: any, @Body() updateStatusDto: UpdateStatusDto) {
-    return this.requestService.updateStatus(params.requestId, updateStatusDto.vendorId, updateStatusDto.status);
+    return this.requestService.updateStatus(
+      params.requestId,
+      updateStatusDto.vendorId,
+      updateStatusDto.status,
+      updateStatusDto.rejectionReason,
+    );
   }
 }

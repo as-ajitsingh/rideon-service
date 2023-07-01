@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import { UserService } from 'src/user/user.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/user/user.schema';
+import { User, UserSchema } from '../user/user.schema';
+import { UserService } from '../user/user.service';
 
 @Module({
   imports: [

@@ -10,4 +10,8 @@ export class VendorService {
   getAllVendors() {
     return this.vendor.find().exec();
   }
+
+  getVendor(vendorId: string) {
+    return this.vendor.findById(vendorId).exec();
+  }
 }

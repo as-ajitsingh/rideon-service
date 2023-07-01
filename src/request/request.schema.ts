@@ -31,6 +31,9 @@ export class Request {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' })
   allotedVendor: VendorDocument;
+
+  @Prop(String)
+  reason: string;
 }
 
 export type RequestDocument = HydratedDocument<Request>;
