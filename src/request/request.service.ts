@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request, RequestDocument, RequestStatus } from './request.schema';
 import { Model } from 'mongoose';
-import { CreateRequestDto } from './dto/request.dto';
+import { CreateRequestDto } from './dto/create-request.dto';
 import { UserDocument } from '../user/user.schema';
 import { VendorService } from '../vendor/vendor.service';
 
