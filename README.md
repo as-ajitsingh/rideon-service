@@ -4,10 +4,18 @@ Builds on NestJs and MongoDB
 
 ## Todo:
 - getAllRequest for employee and admin [x]
-- getAllRequest to return employee name and other details too for admin (auth0 api)
+- getAllRequest to return employee name and other details too for admin (auth0 api) [x]
 - getall vendors [x]
 - change request status [x]
 - server-side validation on create request
+- vendor endpoint
+  - get all vendors [x]
+  - bulkUploadVendors [x]
+  - excel sheet validation
+  - ignore duplicate entries
+- twillio integration
+- email integration
+
 
 
 
