@@ -18,11 +18,11 @@ export class RequestService {
   }
 
   getAllRequestForEmployee(user: UserDocument) {
-    return this.request.find({ raisedBy: user._id }).populate({ path: 'raisedBy', select: 'authId' }).exec();
+    return this.request.find({ raisedBy: user._id }).populate({ path: 'raisedBy' }).exec();
   }
 
   getAllRequestForAdmin() {
-    return this.request.find().populate({ path: 'raisedBy', select: 'authId' }).exec();
+    return this.request.find().populate({ path: 'raisedBy' }).exec();
   }
 
   getRequest(requestId: string) {

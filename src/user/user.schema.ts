@@ -8,6 +8,15 @@ export class User {
 
   @Prop({ type: [String] })
   roles: string[];
+
+  @Prop(String)
+  name: string;
+
+  @Prop(String)
+  email: string;
+
+  @Prop(String)
+  picture: string;
 }
 
 export type UserDocument = HydratedDocument<User>;

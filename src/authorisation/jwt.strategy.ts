@@ -21,11 +21,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       audience: config.get('AUTH0_AUDIENCE'),
       issuer: `${config.get('AUTH0_ISSUER_URL')}`,
       algorithms: ['RS256'],
+      passReqToCallback: true,
     });
   }
 
-  async validate(payload: unknown): Promise<unknown> {
-    const user = await this.userService.getOrRegisterUser((payload as { sub: string }).sub);
+  async validate(request: Request, payload: unknown): Promise<unknown> {
+    const userAccessToken = request.headers['authorization'];
+    const user = await this.userService.getOrRegisterUser((payload as { sub: string }).sub, userAccessToken);
+
     return user;
   }
 }
