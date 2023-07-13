@@ -6,6 +6,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../authorisation/roles.guard';
 import { RequestService } from './request.service';
 import { UpdateStatusDto } from './dto/update-status.dto';
+import Pagination from '../common/pagination.decorator';
+import PaginationDTO from '../common/pagination.dto';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('requests')
@@ -13,10 +15,10 @@ export class RequestController {
   constructor(private requestService: RequestService) {}
 
   @Get()
-  getAllRequests(@RequestingUser() user: UserDocument) {
+  getAllRequests(@RequestingUser() user: UserDocument, @Pagination() paginationOptions: PaginationDTO) {
     return user.roles.includes('admin')
-      ? this.requestService.getAllRequestForAdmin()
-      : this.requestService.getAllRequestForEmployee(user);
+      ? this.requestService.getAllRequestForAdmin(paginationOptions)
+      : this.requestService.getAllRequestForEmployee(user, paginationOptions);
   }
 
   @Post()

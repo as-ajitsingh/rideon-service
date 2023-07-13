@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UserDocument } from '../user/user.schema';
 import { VendorService } from '../vendor/vendor.service';
+import PaginationDTO from '../common/pagination.dto';
 
 @Injectable()
 export class RequestService {
@@ -13,16 +14,23 @@ export class RequestService {
     private vendorService: VendorService,
   ) {}
 
+  private getLimitAndSkipFrom(paginationOptions: PaginationDTO) {
+    const { limit = 10, pageNumber = 1 } = paginationOptions;
+    return { limit, skip: (pageNumber - 1) * limit };
+  }
+
   createRequest(createRequestDto: CreateRequestDto, user: UserDocument) {
     return new this.request({ ...createRequestDto, status: RequestStatus.PENDING, raisedBy: user._id }).save();
   }
 
-  getAllRequestForEmployee(user: UserDocument) {
-    return this.request.find({ raisedBy: user._id }).populate({ path: 'raisedBy' }).exec();
+  getAllRequestForEmployee(user: UserDocument, paginationOptions: PaginationDTO) {
+    const { limit, skip } = this.getLimitAndSkipFrom(paginationOptions);
+    return this.request.find({ raisedBy: user._id }).skip(skip).limit(limit).populate({ path: 'raisedBy' }).exec();
   }
 
-  getAllRequestForAdmin() {
-    return this.request.find().populate({ path: 'raisedBy' }).exec();
+  getAllRequestForAdmin(paginationOptions: PaginationDTO) {
+    const { limit, skip } = this.getLimitAndSkipFrom(paginationOptions);
+    return this.request.find().skip(skip).limit(limit).populate({ path: 'raisedBy' }).exec();
   }
 
   getRequest(requestId: string) {
