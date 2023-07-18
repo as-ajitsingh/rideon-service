@@ -34,6 +34,12 @@ export class Request {
 
   @Prop(String)
   reason: string;
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+
+  @Prop({ type: Date, default: Date.now })
+  updatedAt: Date;
 }
 
 export type RequestDocument = HydratedDocument<Request>;

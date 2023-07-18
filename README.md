@@ -4,10 +4,11 @@ Builds on NestJs and MongoDB
 ## Features
 - Cab Request
   - Employee can create cab request
-  - Employee can view their own cab request
-  - Admin can view cab requests of all employees
+  - Employee can view their own cab requests with paginations
+  - Admin can view cab requests of all employees with paginations
   - Admin can approve cab request and assign vendors
   - Admin can reject cab request and supply rejection message
+  - Admin can export all requests as excel within a time range
 - Vendors
   - Admin can view all vendors
   - Admin can bulk upload vendors via excel sheet (file should be xlxs format, with one sheet having first coloum as vendors name and second as contactNumber, first row is ignored for headers)

@@ -6,6 +6,9 @@ import { CreateRequestDto } from './dto/create-request.dto';
 import { UserDocument } from '../user/user.schema';
 import { VendorService } from '../vendor/vendor.service';
 import PaginationDTO from '../common/pagination.dto';
+import { ExportRequestsFilterDto } from './dto/export-requests-filter.dto';
+import { utils, write } from 'xlsx';
+import { getRequestInfo } from './request.util';
 
 @Injectable()
 export class RequestService {
@@ -15,7 +18,7 @@ export class RequestService {
   ) {}
 
   private getLimitAndSkipFrom(paginationOptions: PaginationDTO) {
-    const { limit = 10, pageNumber = 1 } = paginationOptions;
+    const { limit, pageNumber } = paginationOptions ? paginationOptions : { limit: 10, pageNumber: 1 };
     return { limit, skip: (pageNumber - 1) * limit };
   }
 
@@ -23,14 +26,32 @@ export class RequestService {
     return new this.request({ ...createRequestDto, status: RequestStatus.PENDING, raisedBy: user._id }).save();
   }
 
-  getAllRequestForEmployee(user: UserDocument, paginationOptions: PaginationDTO) {
+  getAllRequestForEmployee(user: UserDocument, paginationOptions?: PaginationDTO) {
     const { limit, skip } = this.getLimitAndSkipFrom(paginationOptions);
     return this.request.find({ raisedBy: user._id }).skip(skip).limit(limit).populate({ path: 'raisedBy' }).exec();
   }
 
-  getAllRequestForAdmin(paginationOptions: PaginationDTO) {
+  getAllRequestForAdmin(paginationOptions?: PaginationDTO) {
     const { limit, skip } = this.getLimitAndSkipFrom(paginationOptions);
     return this.request.find().skip(skip).limit(limit).populate({ path: 'raisedBy' }).exec();
+  }
+
+  async exportRequests(exportRequestFilter: ExportRequestsFilterDto) {
+    const requests = await this.request
+      .find({
+        createdAt: {
+          $gte: exportRequestFilter.startDate,
+          $lte: exportRequestFilter.endDate,
+        },
+      })
+      .populate({ path: 'raisedBy' })
+      .exec();
+
+    const worksheet = utils.json_to_sheet(requests.map(getRequestInfo));
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Requests');
+
+    return write(workbook, { type: 'buffer', bookType: 'xlsx' });
   }
 
   getRequest(requestId: string) {
