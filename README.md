@@ -4,8 +4,8 @@ Builds on NestJs and MongoDB
 ## Features
 - Cab Request
   - Employee can create cab request
-  - Employee can view their own cab requests with paginations
-  - Admin can view cab requests of all employees with paginations
+  - Employee can view their own cab requests with paginations (provide `page-number` and `limit` as query params)
+  - Admin can view cab requests of all employees with paginations (provide `page-number` and `limit` as query params)
   - Admin can approve cab request and assign vendors
   - Admin can reject cab request and supply rejection message
   - Admin can export all requests as excel within a time range

@@ -18,22 +18,36 @@ export class RequestService {
   ) {}
 
   private getLimitAndSkipFrom(paginationOptions: PaginationDTO) {
-    const { limit, pageNumber } = paginationOptions ? paginationOptions : { limit: 10, pageNumber: 1 };
-    return { limit, skip: (pageNumber - 1) * limit };
+    const limit = paginationOptions.limit || 10;
+    const pageNumber = paginationOptions.pageNumber || 1;
+    return { limit, pageNumber, skip: (pageNumber - 1) * limit };
   }
 
   createRequest(createRequestDto: CreateRequestDto, user: UserDocument) {
     return new this.request({ ...createRequestDto, status: RequestStatus.PENDING, raisedBy: user._id }).save();
   }
 
-  getAllRequestForEmployee(user: UserDocument, paginationOptions?: PaginationDTO) {
-    const { limit, skip } = this.getLimitAndSkipFrom(paginationOptions);
-    return this.request.find({ raisedBy: user._id }).skip(skip).limit(limit).populate({ path: 'raisedBy' }).exec();
+  async getAllRequestForEmployee(user: UserDocument, paginationOptions?: PaginationDTO) {
+    const { limit, skip, pageNumber } = this.getLimitAndSkipFrom(paginationOptions);
+
+    const count = await this.request.count({ raisedBy: user._id }).exec();
+    const requests = await this.request
+      .find({ raisedBy: user._id })
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: 'raisedBy' })
+      .exec();
+
+    return { data: requests, metadata: { pageNumber, limit, total: count } };
   }
 
-  getAllRequestForAdmin(paginationOptions?: PaginationDTO) {
-    const { limit, skip } = this.getLimitAndSkipFrom(paginationOptions);
-    return this.request.find().skip(skip).limit(limit).populate({ path: 'raisedBy' }).exec();
+  async getAllRequestForAdmin(paginationOptions?: PaginationDTO) {
+    const { limit, skip, pageNumber } = this.getLimitAndSkipFrom(paginationOptions);
+
+    const count = await this.request.count().exec();
+    const requests = await this.request.find().skip(skip).limit(limit).populate({ path: 'raisedBy' }).exec();
+
+    return { data: requests, metadata: { pageNumber, limit, total: count } };
   }
 
   async exportRequests(exportRequestFilter: ExportRequestsFilterDto) {
