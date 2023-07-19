@@ -59,11 +59,20 @@ export class RequestService {
         },
       })
       .populate({ path: 'raisedBy' })
+      .populate({ path: 'allotedVendor' })
       .exec();
 
-    const worksheet = utils.json_to_sheet(requests.map(getRequestInfo));
+    const groupedRequests = requests.reduce((groupedRequests: { [k: string]: Request[] }, request) => {
+      if (groupedRequests[request.status]) groupedRequests[request.status].push(request);
+      else groupedRequests[request.status] = [request];
+      return groupedRequests;
+    }, {});
+
     const workbook = utils.book_new();
-    utils.book_append_sheet(workbook, worksheet, 'Requests');
+
+    Object.entries(groupedRequests).forEach(([status, requests]) => {
+      utils.book_append_sheet(workbook, utils.json_to_sheet(requests.map(getRequestInfo)), status);
+    });
 
     return write(workbook, { type: 'buffer', bookType: 'xlsx' });
   }

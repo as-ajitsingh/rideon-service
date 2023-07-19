@@ -12,8 +12,7 @@ export const getRequestInfo = (request: RequestDocument) => ({
   'PickUp Location': request.pickupLocation,
   'Drop Location': request.dropLocation,
   'Pickup Time': request.pickupTime,
-  Status: request.status,
-  Vendor: request.allotedVendor ?? undefined,
+  Vendor: request.allotedVendor?.name,
   'Created At': getFormattedDate(request.createdAt),
   'Updated At': getFormattedDate(request.updatedAt),
 });
