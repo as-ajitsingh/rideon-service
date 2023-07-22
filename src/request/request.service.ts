@@ -41,6 +41,7 @@ export class RequestService {
       .skip(skip)
       .limit(limit)
       .populate({ path: 'raisedBy' })
+      .populate({ path: 'allotedVendor' })
       .exec();
 
     return { data: requests, metadata: { pageNumber, limit, total: count } };
@@ -50,7 +51,13 @@ export class RequestService {
     const { limit, skip, pageNumber } = this.getLimitAndSkipFrom(paginationOptions);
 
     const count = await this.request.count().exec();
-    const requests = await this.request.find().skip(skip).limit(limit).populate({ path: 'raisedBy' }).exec();
+    const requests = await this.request
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: 'raisedBy' })
+      .populate({ path: 'allotedVendor' })
+      .exec();
 
     return { data: requests, metadata: { pageNumber, limit, total: count } };
   }
