@@ -103,7 +103,7 @@ export class RequestService {
         .exec();
 
       if (result.acknowledged && result.modifiedCount != 0) {
-        this.smsService.sendMessage(
+        await this.smsService.sendMessage(
           vendor.contactNumber,
           getformattedApprovalMessage(request, this.configService.get('ASSIGNMENT_MESSAGE')),
         );
