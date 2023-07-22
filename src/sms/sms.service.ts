@@ -1,23 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as twilio from 'twilio';
+import fetch from 'node-fetch';
 import { getFormattedContactNumber } from './sms.utils';
 
 @Injectable()
 export class SMSService {
-  twilioClient: twilio.Twilio;
-  constructor(private configService: ConfigService) {
-    this.twilioClient = twilio(configService.get('TWILIO_ACCOUNT_SID'), configService.get('TWILIO_AUTH_TOKEN'));
-  }
+  constructor(private configService: ConfigService) {}
 
   sendMessage(contactNumber: string, text: string) {
-    this.twilioClient.messages
-      .create({
-        to: getFormattedContactNumber(contactNumber),
-        body: text,
-        from: this.configService.get('TWILIO_NUMBER'),
-      })
-      .then((message) => console.log(`message ${message.sid} is ${message.status}`))
-      .catch((e) => console.error(e.message));
+    const headers = {
+      Authorization: `Basic ${Buffer.from(
+        `${this.configService.get('TWILIO_ACCOUNT_SID')}:${this.configService.get('TWILIO_AUTH_TOKEN')}`,
+      ).toString('base64')}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+    const body = new URLSearchParams({
+      To: getFormattedContactNumber(contactNumber),
+      From: this.configService.get('TWILIO_NUMBER'),
+      Body: text,
+    });
+
+    fetch(`${this.configService.get('TWILIO_URL')}/${this.configService.get('TWILIO_ACCOUNT_SID')}/Messages.json`, {
+      method: 'POST',
+      headers: headers,
+      body: body,
+    })
+      .then((response) => response.json())
+      .then((response) => console.log(`message ${response.sid} is ${response.status}`))
+      .catch((error) => console.error('Error sending SMS:', error));
   }
 }
