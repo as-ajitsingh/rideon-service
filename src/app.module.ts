@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RequestModule } from './request/request.module';
 import { VendorModule } from './vendor/vendor.module';
+import { SMSModule } from './sms/sms.module';
 
 const getEnvFilePath = () => {
   if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
@@ -29,6 +30,7 @@ const configModuleOptions: ConfigModuleOptions = {
     UserModule,
     RequestModule,
     VendorModule,
+    SMSModule,
   ],
   controllers: [],
   providers: [],

@@ -1,20 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Request, RequestDocument, RequestStatus } from './request.schema';
 import { Model } from 'mongoose';
+import { utils, write } from 'xlsx';
+
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UserDocument } from '../user/user.schema';
 import { VendorService } from '../vendor/vendor.service';
 import PaginationDTO from '../common/pagination.dto';
 import { ExportRequestsFilterDto } from './dto/export-requests-filter.dto';
-import { utils, write } from 'xlsx';
-import { getRequestInfo } from './request.util';
+import { Request, RequestDocument, RequestStatus } from './request.schema';
+import { getRequestInfo, getformattedApprovalMessage } from './request.util';
+import { SMSService } from '../sms/sms.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RequestService {
   constructor(
     @InjectModel(Request.name) private request: Model<RequestDocument>,
     private vendorService: VendorService,
+    private smsService: SMSService,
+    private configService: ConfigService,
   ) {}
 
   private getLimitAndSkipFrom(paginationOptions: PaginationDTO) {
@@ -78,25 +83,38 @@ export class RequestService {
   }
 
   getRequest(requestId: string) {
-    return this.request.findById(requestId).exec();
+    return this.request.findById(requestId).populate({ path: 'raisedBy' }).exec();
   }
 
   async updateStatus(requestId: string, vendorId: string, status: RequestStatus, rejectionReason: string) {
-    if (!(await this.getRequest(requestId))) throw new Error('request id not valid');
+    const request = await this.getRequest(requestId);
 
-    let query = {};
+    if (!request) throw new Error('request id not valid');
 
     if (status === RequestStatus.APPROVED) {
       if (!vendorId) throw new Error('vendor required for approval');
-      if (!(await this.vendorService.getVendor(vendorId))) throw new Error('vendor id not valid');
 
-      query = { $set: { allotedVendor: vendorId, status }, $unset: { reason: 1 } };
+      const vendor = await this.vendorService.getVendor(vendorId);
+
+      if (!vendor) throw new Error('vendor id not valid');
+
+      const result = await this.request
+        .updateOne({ _id: requestId }, { $set: { allotedVendor: vendorId, status }, $unset: { reason: 1 } })
+        .exec();
+
+      if (result.acknowledged && result.modifiedCount != 0) {
+        this.smsService.sendMessage(
+          vendor.contactNumber,
+          getformattedApprovalMessage(request, this.configService.get('ASSIGNMENT_MESSAGE')),
+        );
+      }
     } else if (status === RequestStatus.REJECTED) {
       if (!rejectionReason) throw new Error('reason required for rejection');
 
-      query = { $set: { status, reason: rejectionReason }, $unset: { allotedVendor: 1 } };
+      const result = await this.request
+        .updateOne({ _id: requestId }, { $set: { status, reason: rejectionReason }, $unset: { allotedVendor: 1 } })
+        .exec();
+      console.log(RequestStatus.REJECTED, result);
     }
-
-    await this.request.updateOne({ _id: requestId }, query).exec();
   }
 }
