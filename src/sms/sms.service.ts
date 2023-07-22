@@ -7,7 +7,7 @@ import { getFormattedContactNumber } from './sms.utils';
 export class SMSService {
   constructor(private configService: ConfigService) {}
 
-  sendMessage(contactNumber: string, text: string) {
+  async sendMessage(contactNumber: string, text: string) {
     const headers = {
       Authorization: `Basic ${Buffer.from(
         `${this.configService.get('TWILIO_ACCOUNT_SID')}:${this.configService.get('TWILIO_AUTH_TOKEN')}`,
@@ -19,14 +19,19 @@ export class SMSService {
       From: this.configService.get('TWILIO_NUMBER'),
       Body: text,
     });
-
-    fetch(`${this.configService.get('TWILIO_URL')}/${this.configService.get('TWILIO_ACCOUNT_SID')}/Messages.json`, {
-      method: 'POST',
-      headers: headers,
-      body: body,
-    })
-      .then((response) => response.json())
-      .then((response) => console.log(`message ${response.sid} is ${response.status}`))
-      .catch((error) => console.error('Error sending SMS:', error));
+    try {
+      const response = await fetch(
+        `${this.configService.get('TWILIO_URL')}/${this.configService.get('TWILIO_ACCOUNT_SID')}/Messages.json`,
+        {
+          method: 'POST',
+          headers: headers,
+          body: body,
+        },
+      );
+      const result = await response.json();
+      console.log(`message ${result.sid} is ${result.status}`);
+    } catch (error) {
+      console.error('Error sending SMS:', error);
+    }
   }
 }
