@@ -10,7 +10,7 @@ Builds on NestJs and MongoDB
   - Admin can reject cab request and supply rejection message
   - Admin can export all requests as excel within a time range grouped by status
 - Vendors
-  - Admin can view all vendors
+  - Admin can view all vendors with paginations (provide `page-number` and `limit` as query params)`
   - Admin can bulk upload vendors via excel sheet (file should be xlxs format, with one sheet having first coloum as vendors name and second as contactNumber, first row is ignored for headers)
 - Authentication
   - Requires access token from auth0 to access api

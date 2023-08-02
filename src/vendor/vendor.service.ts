@@ -3,13 +3,20 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Vendor, VendorDocument } from './vendor.schema';
 import { read, utils } from 'xlsx';
+import PaginationDTO from '../common/pagination.dto';
+import { getLimitAndSkipFrom } from '../common/utils';
 
 @Injectable()
 export class VendorService {
   constructor(@InjectModel(Vendor.name) private vendor: Model<VendorDocument>) {}
 
-  getAllVendors() {
-    return this.vendor.find().exec();
+  async getAllVendors(paginationOptions?: PaginationDTO) {
+    const { limit, skip, pageNumber } = getLimitAndSkipFrom(paginationOptions);
+
+    const count = await this.vendor.count().exec();
+    const vendors = await this.vendor.find().skip(skip).limit(limit).exec();
+
+    return { data: vendors, metadata: { pageNumber, limit, total: count } };
   }
 
   getVendor(vendorId: string) {

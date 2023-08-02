@@ -12,6 +12,7 @@ import { Request, RequestDocument, RequestStatus } from './request.schema';
 import { getRequestInfo, getformattedApprovalMessage } from './request.util';
 import { SMSService } from '../sms/sms.service';
 import { ConfigService } from '@nestjs/config';
+import { getLimitAndSkipFrom } from '../common/utils';
 
 @Injectable()
 export class RequestService {
@@ -22,18 +23,12 @@ export class RequestService {
     private configService: ConfigService,
   ) {}
 
-  private getLimitAndSkipFrom(paginationOptions: PaginationDTO) {
-    const limit = paginationOptions.limit || 10;
-    const pageNumber = paginationOptions.pageNumber || 1;
-    return { limit, pageNumber, skip: (pageNumber - 1) * limit };
-  }
-
   createRequest(createRequestDto: CreateRequestDto, user: UserDocument) {
     return new this.request({ ...createRequestDto, status: RequestStatus.PENDING, raisedBy: user._id }).save();
   }
 
   async getAllRequestForEmployee(user: UserDocument, paginationOptions?: PaginationDTO) {
-    const { limit, skip, pageNumber } = this.getLimitAndSkipFrom(paginationOptions);
+    const { limit, skip, pageNumber } = getLimitAndSkipFrom(paginationOptions);
 
     const count = await this.request.count({ raisedBy: user._id }).exec();
     const requests = await this.request
@@ -48,7 +43,7 @@ export class RequestService {
   }
 
   async getAllRequestForAdmin(paginationOptions?: PaginationDTO) {
-    const { limit, skip, pageNumber } = this.getLimitAndSkipFrom(paginationOptions);
+    const { limit, skip, pageNumber } = getLimitAndSkipFrom(paginationOptions);
 
     const count = await this.request.count().exec();
     const requests = await this.request
