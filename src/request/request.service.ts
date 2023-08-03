@@ -48,12 +48,13 @@ export class RequestService {
   }
 
   private async sendConfirmationMail(requestWithRaisedBy: RequestDocument) {
-    const admins = (await this.userService.getAllAdmins()).map((user) => user.email);
+    const admins = await this.userService.getAllAdmins();
+    const adminEmails = admins.map((user) => user.email);
     const subject = getFormattedSubject(requestWithRaisedBy, this.configService.get('NEW_REQUEST_MAIL_SUBJECT'));
     const webAppRequestPath = this.configService.get('WEB_APP_REQUEST_PATH');
     const webAppUrl = this.configService.get('WEB_APP_URL');
     await this.emailService.sendMail(
-      admins,
+      adminEmails,
       subject,
       getformattedNewRequestEmailHtml(requestWithRaisedBy, emailTemplate, webAppUrl, webAppRequestPath),
     );

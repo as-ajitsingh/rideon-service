@@ -7,7 +7,7 @@ export class EmailService {
   constructor(private mailerService: MailerService, private configService: ConfigService) {}
 
   async sendMail(to: string | string[], subject: string, html: string) {
-    console.log('sending mail to ' + to.length + 'admins');
+    console.log('sending mail to ' + to.length + ' admins');
     await this.mailerService.sendMail({
       to,
       subject,
