@@ -8,14 +8,18 @@ export class EmailService {
 
   async sendMail(to: string | string[], subject: string, html: string) {
     console.log('sending mail to ' + to.length + ' admins');
-    await this.mailerService.sendMail({
-      to,
-      subject,
-      html,
-      from: {
-        name: this.configService.get('EMAIL_FROM_NAME'),
-        address: this.configService.get('EMAIL_FROM_ADDRESS'),
-      },
-    });
+    try {
+      await this.mailerService.sendMail({
+        to,
+        subject,
+        html,
+        from: {
+          name: this.configService.get('EMAIL_FROM_NAME'),
+          address: this.configService.get('EMAIL_FROM_ADDRESS'),
+        },
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
