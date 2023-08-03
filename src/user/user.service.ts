@@ -23,7 +23,7 @@ export class UserService {
   }
 
   async getAllAdmins() {
-    return this.user.find({ roles: { $in: ['admin'] } }).exec();
+    return await this.user.find({ roles: { $in: ['admin'] } }).exec();
   }
 
   async getUserInfo(token) {
