@@ -3,7 +3,7 @@ Builds on NestJs and MongoDB
 
 ## Features
 - Cab Request
-  - Employee can create cab request
+  - Employee can create cab request, a mail will be sent to all admins
   - Employee can view their own cab requests with paginations (provide `page-number` and `limit` as query params)
   - Admin can view cab requests of all employees with paginations (provide `page-number` and `limit` as query params)
   - Admin can approve cab request and assign vendors, a sms will be sent to vendor's constact number giving details about request
@@ -22,7 +22,6 @@ Builds on NestJs and MongoDB
 - vendor endpoint
   - excel sheet validation
   - ignore duplicate entries
-- email integration
 
 
 

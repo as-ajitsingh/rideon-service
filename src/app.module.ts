@@ -6,6 +6,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RequestModule } from './request/request.module';
 import { VendorModule } from './vendor/vendor.module';
 import { SMSModule } from './sms/sms.module';
+import { EmailModule } from './email/email.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 const getEnvFilePath = () => {
   if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
@@ -20,10 +22,24 @@ const configModuleOptions: ConfigModuleOptions = {
   load: [() => ({ app: { name: 'rideon-service' } })],
 };
 
+ConfigModule.forRoot();
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.DB_URL, {
-      dbName: 'rideon',
+      dbName: process.env.DB_NAME,
+    }),
+    MailerModule.forRoot({
+      transport: {
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: process.env.EMAIL_FROM_ADDRESS,
+          clientId: process.env.EMAIL_CLIENT_ID,
+          clientSecret: process.env.EMAIL_CLIENT_SECRET,
+          refreshToken: process.env.EMAIL_CLIENT_REFRESH_TOKEN,
+          accessToken: process.env.EMAIL_CLIENT_ACCESS_TOKEN,
+        },
+      },
     }),
     ConfigModule.forRoot(configModuleOptions),
     AuthorisationModule,
@@ -31,6 +47,7 @@ const configModuleOptions: ConfigModuleOptions = {
     RequestModule,
     VendorModule,
     SMSModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [],

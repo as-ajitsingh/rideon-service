@@ -9,10 +9,18 @@ import { VendorService } from '../vendor/vendor.service';
 import PaginationDTO from '../common/pagination.dto';
 import { ExportRequestsFilterDto } from './dto/export-requests-filter.dto';
 import { Request, RequestDocument, RequestStatus } from './request.schema';
-import { getRequestInfo, getformattedApprovalMessage } from './request.util';
+import {
+  getFormattedSubject,
+  getRequestInfo,
+  getformattedApprovalMessage,
+  getformattedNewRequestEmailHtml,
+} from './request.util';
 import { SMSService } from '../sms/sms.service';
 import { ConfigService } from '@nestjs/config';
 import { getLimitAndSkipFrom } from '../common/utils';
+import { EmailService } from '../email/email.service';
+import { UserService } from '../user/user.service';
+import { emailTemplate } from './email.template.hbs';
 
 @Injectable()
 export class RequestService {
@@ -20,11 +28,35 @@ export class RequestService {
     @InjectModel(Request.name) private request: Model<RequestDocument>,
     private vendorService: VendorService,
     private smsService: SMSService,
+    private emailService: EmailService,
+    private userService: UserService,
     private configService: ConfigService,
   ) {}
 
-  createRequest(createRequestDto: CreateRequestDto, user: UserDocument) {
-    return new this.request({ ...createRequestDto, status: RequestStatus.PENDING, raisedBy: user._id }).save();
+  async createRequest(createRequestDto: CreateRequestDto, user: UserDocument) {
+    const request = await new this.request({
+      ...createRequestDto,
+      status: RequestStatus.PENDING,
+      raisedBy: user._id,
+    }).save();
+
+    const requestWithUser = await request.populate({ path: 'raisedBy' });
+
+    await this.sendConfirmationMail(requestWithUser);
+
+    return request;
+  }
+
+  private async sendConfirmationMail(requestWithRaisedBy: RequestDocument) {
+    const admins = (await this.userService.getAllAdmins()).map((user) => user.email);
+    const subject = getFormattedSubject(requestWithRaisedBy, this.configService.get('NEW_REQUEST_MAIL_SUBJECT'));
+    const webAppRequestPath = this.configService.get('WEB_APP_REQUEST_PATH');
+    const webAppUrl = this.configService.get('WEB_APP_URL');
+    await this.emailService.sendMail(
+      admins,
+      subject,
+      getformattedNewRequestEmailHtml(requestWithRaisedBy, emailTemplate, webAppUrl, webAppRequestPath),
+    );
   }
 
   async getAllRequestForEmployee(user: UserDocument, paginationOptions?: PaginationDTO) {

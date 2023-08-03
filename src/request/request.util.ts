@@ -1,6 +1,7 @@
 import { sprintf } from 'sprintf-js';
 import { RequestDocument } from './request.schema';
 import { getReadableDateTime } from '../common/utils';
+import Handlebars from 'handlebars';
 
 const getFormattedDate = (date: Date) =>
   date.toLocaleString('en-US', {
@@ -30,3 +31,21 @@ export const getformattedApprovalMessage = (request: RequestDocument, messageTem
     request.raisedBy.email,
     '+91-9000XXXXXX',
   );
+
+export const getformattedNewRequestEmailHtml = (
+  request: RequestDocument,
+  emailTemplate: string,
+  webAppUrl: string,
+  webAppRequstPath: string,
+) =>
+  Handlebars.compile(emailTemplate)({
+    webAppUrl,
+    name: request.raisedBy.name,
+    pickupLocation: request.pickupLocation,
+    dropLocation: request.dropLocation,
+    pickupTime: getReadableDateTime(request.pickupTime),
+    requestUrl: webAppRequstPath + request._id,
+  });
+
+export const getFormattedSubject = (request: RequestDocument, subjectTemplate: string) =>
+  sprintf(subjectTemplate, request.raisedBy.name);

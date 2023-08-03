@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.9.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/mongoose": "^9.2.2",
@@ -27,6 +28,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "dotenv": "^16.1.1",
     "express-jwt": "^8.4.1",
+    "handlebars": "^4.7.8",
     "jwks-rsa": "^3.0.1",
     "mongoose": "^7.2.2",
     "node-fetch": "^2.6.12",

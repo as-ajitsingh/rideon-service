@@ -22,6 +22,10 @@ export class UserService {
     return this.user.findOne({ authId: authId }).exec();
   }
 
+  async getAllAdmins() {
+    return this.user.find({ roles: { $in: ['admin'] } }).exec();
+  }
+
   async getUserInfo(token) {
     const response = await fetch(`${this.configService.get('AUTH0_ISSUER_URL')}userinfo`, {
       method: 'GET',
