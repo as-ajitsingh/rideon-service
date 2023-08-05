@@ -19,6 +19,7 @@ Builds on NestJs and MongoDB
 
 ## Todo:
 - server-side validation on create request
+- send request approval or rejection to employee
 - vendor endpoint
   - excel sheet validation
   - ignore duplicate entries
