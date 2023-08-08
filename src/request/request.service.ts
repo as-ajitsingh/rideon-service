@@ -102,6 +102,12 @@ export class RequestService {
       .populate({ path: 'allotedVendor' })
       .exec();
 
+    if (requests && requests.length === 0) {
+      const workbook = utils.book_new();
+      utils.book_append_sheet(workbook, utils.json_to_sheet([{ info: 'There is no data for give date' }]), 'info');
+      return write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    }
+
     const groupedRequests = requests.reduce((groupedRequests: { [k: string]: Request[] }, request) => {
       if (groupedRequests[request.status]) groupedRequests[request.status].push(request);
       else groupedRequests[request.status] = [request];
