@@ -44,7 +44,7 @@ export const getformattedNewRequestEmailHtml = (
     pickupLocation: request.pickupLocation,
     dropLocation: request.dropLocation,
     pickupTime: getReadableDateTime(request.pickupTime),
-    requestUrl: webAppRequstPath + request._id,
+    requestUrl: webAppRequstPath,
   });
 
 export const getFormattedSubject = (request: RequestDocument, subjectTemplate: string) =>
