@@ -66,6 +66,7 @@ export class RequestService {
     const count = await this.request.count({ raisedBy: user._id }).exec();
     const requests = await this.request
       .find({ raisedBy: user._id })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate({ path: 'raisedBy' })
@@ -81,6 +82,7 @@ export class RequestService {
     const count = await this.request.count().exec();
     const requests = await this.request
       .find()
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate({ path: 'raisedBy' })
@@ -91,13 +93,15 @@ export class RequestService {
   }
 
   async exportRequests(exportRequestFilter: ExportRequestsFilterDto) {
+
     const requests = await this.request
       .find({
         createdAt: {
-          $gte: exportRequestFilter.startDate,
-          $lte: exportRequestFilter.endDate,
+          $gte: exportRequestFilter.startDate.toISOString().split('T')[0] + 'T00:00:00.000Z',
+          $lte: exportRequestFilter.endDate.toISOString().split('T')[0] + 'T23:59:59.999Z',
         },
       })
+      .sort({ createdAt: -1 })
       .populate({ path: 'raisedBy' })
       .populate({ path: 'allotedVendor' })
       .exec();
